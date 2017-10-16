@@ -1,0 +1,67 @@
+---
+title: "logistic_regression"
+author: "Michael Moran"
+date: "October 15, 2017"
+output: html_document
+---
+
+#Set working directory 
+```{r}
+setwd("~/Foundations of Data Science/logistic_regression")
+```
+
+#Read and examine the data 
+```{r}
+health.data <- readRDS("dataSets/NatHealth2011.rds")
+str(health.data)
+```
+
+#Check structure and levels of everwrk
+```{r}
+str(health.data$everwrk)
+levels(health.data$everwrk)
+levels(health.data$r_maritl)
+```
+
+#Transform missing values 
+```{r}
+health.data$everwrk <- factor(health.data$everwrk, levels=c("2 No", "1 Yes"))
+
+levels(health.data$everwrk)
+```
+
+#Run the regression model for age and marital status
+```{r}
+work.mod <- glm(everwrk~age_p+r_maritl,
+              data=health.data, family="binomial")
+
+coef(summary(work.mod))
+```
+
+#Transform coefficients to make them easier to interpret
+```{r}
+work.mod.tab <- coef(summary(work.mod))
+work.mod.tab[, "Estimate"] <- exp(coef(work.mod))
+work.mod.tab
+```
+
+# Create a dataset with predictors set at desired levels
+```{r}
+predDat <- with(health.data,
+                expand.grid(age_p = c(20, 30, 40, 50, 60, 70, 80),
+                            r_maritl = c("2 Married - spouse not in household", "4 Widowed", "5 Divorced", "6 Separated", "7 Never married")))
+
+
+
+```
+
+# Predict the probability of working for each level of marital status
+```{r}
+cbind(predDat, predict(work.mod, type = "response",
+                       se.fit = TRUE, interval="confidence",
+                       newdata = predDat, na.rm = TRUE))
+```
+
+
+
+
