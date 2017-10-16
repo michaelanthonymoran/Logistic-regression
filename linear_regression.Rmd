@@ -1,0 +1,87 @@
+---
+title: "Linear Regression exercise"
+author: "Michael Moran"
+date: "October 15, 2017"
+output: html_document
+---
+
+#Set working directory
+
+```{r}
+setwd("~/Foundations of Data Science/linear_regression/linear_regression")
+list.files("dataSets") 
+```
+
+# Read and examine the states data
+```{r}
+states.data <- readRDS("dataSets/states.rds") 
+str(states.data)
+```
+
+# summary of expense and csat columns, all rows
+```{r}
+sts.met.en <- subset(states.data, select = c("metro", "energy"))
+summary(sts.met.en)
+```
+
+# correlation between metro and energy 
+```{r}
+cor(sts.met.en) 
+```
+
+# scatter plot of metro vs energy
+```{r}
+plot(sts.met.en)
+```
+
+# Fit our regression model
+```{r}
+sat.mod <- lm(energy ~ metro, 
+              data=states.data) 
+```
+
+# Summarize and print the results
+```{r}
+summary(sat.mod) 
+```
+
+#Plot the model to evaluate for deviations from assumptions
+```{r}
+plot(sat.mod)
+```
+
+#Select one or more additional predictors for our model
+
+```{r}
+sts.met.en.exp <- subset(states.data, select = c("metro", "energy", "expense"))
+summary(sts.met.en.exp)
+```
+
+```{r}
+plot(sts.met.en.exp)
+```
+
+```{r}
+cor(sts.met.en.exp)
+```
+
+```{r}
+sat.mod2 <- lm(energy ~ metro + expense, data = states.data)
+summary(sat.mod2)
+```
+
+#Add on to the regression equation that you created in exercise 1 by generating an interaction term and testing the interaction.
+```{r}
+sat.mod.en.metro_by_waste <- lm(energy ~ metro * waste, data = states.data)
+```
+
+
+#Try adding region to the model. Are there significant differences across the four regions?
+```{r}
+sat.mod.en.region <- lm(energy ~ metro * waste + region, data = states.data)
+anova(sat.mod.en.region)
+```
+
+
+
+
